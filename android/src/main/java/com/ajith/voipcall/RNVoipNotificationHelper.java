@@ -62,6 +62,7 @@ public class RNVoipNotificationHelper {
                 .setTimeoutAfter(json.getInt("duration"))
                 .setOnlyAlertOnce(true)
                 .setFullScreenIntent(getPendingIntent(notificationID, "fullScreenIntent", json) , true)
+                .setVisibility(0)
                 .setContentIntent(getPendingIntent(notificationID, "contentTap", json))
                 .setSmallIcon(R.drawable.ic_call_black_24dp)
                 .setPriority(Notification.PRIORITY_MAX)
@@ -84,6 +85,7 @@ public class RNVoipNotificationHelper {
             Uri sounduri = Uri.parse("android.resource://" + context.getPackageName() + "/"+ R.raw.nosound);
             NotificationChannel channel = new NotificationChannel(callChannel, json.getString("channel_name"), NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("Call Notifications");
+            channel.setImportance(4);
             channel.setSound(sounduri ,
                     new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                             .setUsage(AudioAttributes.USAGE_UNKNOWN).build());
