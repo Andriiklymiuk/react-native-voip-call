@@ -51,13 +51,6 @@ public class RNVoipNotificationHelper {
     public void sendNotification(ReadableMap json){
         int notificationID = json.getInt("notificationId");
 
-        Intent dissmissIntent = new Intent(context, RNVoipBroadcastReciever.class);
-        dissmissIntent.setAction("callDismiss");
-        dissmissIntent.putExtra("notificationId",notificationID);
-        dissmissIntent.putExtra("callerId", json.getString("callerId"));
-        dissmissIntent.putExtra("missedCallTitle", json.getString("missedCallTitle"));
-        dissmissIntent.putExtra("missedCallBody", json.getString("missedCallBody"));
-        PendingIntent callDismissIntent = PendingIntent.getBroadcast(context,0, dissmissIntent ,PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri sounduri = Uri.parse("android.resource://" + context.getPackageName() + "/"+ R.raw.nosound);
 
@@ -76,7 +69,7 @@ public class RNVoipNotificationHelper {
                 .setSound(sounduri)
                 .setContentText(json.getString("notificationBody"))
                 .addAction(0, json.getString("answerActionTitle"), getPendingIntent(notificationID, "callAnswer",json))
-                .addAction(0, json.getString("declineActionTitle"), callDismissIntent)
+                .addAction(0, json.getString("declineActionTitle"), getPendingIntent(notificationID, "callDismiss",json))
                 .build();
 
         NotificationManager notificationManager = notificationManager();
@@ -100,6 +93,20 @@ public class RNVoipNotificationHelper {
         }
     }
 
+    public PendingIntent getDismissIntent(int notificationID, String type, ReadableMap json) {
+        Intent dissmissIntent = new Intent(context, RNVoipBroadcastReciever.class);
+        dissmissIntent.setAction("callDismiss");
+        dissmissIntent.putExtra("notificationId", notificationID);
+        dissmissIntent.putExtra("callerId", json.getString("callerId"));
+        dissmissIntent.putExtra("missedCallTitle", json.getString("missedCallTitle"));
+        dissmissIntent.putExtra("missedCallBody", json.getString("missedCallBody"));
+        // TODO: fix here probably
+        PendingIntent callDismissIntent = PendingIntent.getBroadcast(context, 0, dissmissIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        getPendingIntent(notificationID, "callAnswer", json);
+
+        return callDismissIntent;
+    }
 
     public PendingIntent getPendingIntent(int notificationID , String type, ReadableMap json){
         Class intentClass = getMainActivityClass();

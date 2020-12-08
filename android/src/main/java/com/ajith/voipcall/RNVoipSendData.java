@@ -38,6 +38,8 @@ public class RNVoipSendData {
                 case "fullScreenIntent":
                     promise.resolve(params);
                     break;
+                case "callDismiss":
+                    promise.resolve(params);
                 case "contentTap":
                     promise.resolve(params);
                     break;
@@ -73,6 +75,7 @@ public class RNVoipSendData {
                     sendEvent(mReactContext,"RNVoipCallNotificationTap", params);
                     break;
                 case "callDismiss":
+                    params.putString("callerId", intent.getStringExtra("callerId"));
                     sendEvent(mReactContext,"RNVoipCallPerformEndCallAction", params);
                     break;
                 case "missedCallTape":
