@@ -7,12 +7,18 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 
+import androidx.annotation.ColorRes;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import androidx.core.app.NotificationCompat;
+import android.text.style.ForegroundColorSpan;
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReadableMap;
@@ -47,6 +53,14 @@ public class RNVoipNotificationHelper {
         sendNotification(jsonObject);
     }
 
+    private Spannable getActionText(String string, @ColorRes int colorRes) {
+      Spannable spannable = new SpannableString(string);
+      if (VERSION.SDK_INT >= VERSION_CODES.N_MR1) {
+        spannable.setSpan(
+          new ForegroundColorSpan(context.getColor(colorRes)), 0, spannable.length(), 0);
+      }
+      return spannable;
+    }
 
     public void sendNotification(ReadableMap json){
         int notificationID = json.getInt("notificationId");
@@ -69,8 +83,8 @@ public class RNVoipNotificationHelper {
                 .setContentTitle(json.getString("notificationTitle"))
                 .setSound(sounduri)
                 .setContentText(json.getString("notificationBody"))
-                .addAction(0, json.getString("answerActionTitle"), getPendingIntent(notificationID, "callAnswer",json))
-                .addAction(0, json.getString("declineActionTitle"), getPendingIntent(notificationID, "callDismiss",json))
+                .addAction(0, getActionText(json.getString("answerActionTitle"), android.R.color.holo_green_light) , getPendingIntent(notificationID, "callAnswer",json))
+                .addAction(0, getActionText(json.getString("declineActionTitle"), android.R.color.holo_red_dark), getPendingIntent(notificationID, "callDismiss",json))
                 .build();
 
         NotificationManager notificationManager = notificationManager();
@@ -102,7 +116,7 @@ public class RNVoipNotificationHelper {
         dissmissIntent.putExtra("callerId", json.getString("callerId"));
         dissmissIntent.putExtra("missedCallTitle", json.getString("missedCallTitle"));
         dissmissIntent.putExtra("missedCallBody", json.getString("missedCallBody"));
-        // TODO: fix here probably
+
         PendingIntent callDismissIntent = PendingIntent.getBroadcast(context, 0, dissmissIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         getPendingIntent(notificationID, "callAnswer", json);
