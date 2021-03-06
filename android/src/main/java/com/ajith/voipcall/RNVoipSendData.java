@@ -19,6 +19,10 @@ public class RNVoipSendData {
     }
 
     public void sendIntilialData(Promise promise, Intent intent){
+        if(intent == null){
+            promise.reject("error","no Intent, no new Call Notications");
+            return;
+        }
         WritableMap params = Arguments.createMap();
         String action = intent.getAction();
         if(action == null){
