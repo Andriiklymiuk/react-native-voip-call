@@ -67,6 +67,10 @@ public class RNVoipCallModule extends ReactContextBaseJavaModule implements Acti
   @ReactMethod
   public void getInitialNotificationActions(Promise promise) {
     Activity activity = getCurrentActivity();
+    if (activity == null){
+      sendjsData.sendIntilialData(promise,null);
+      return;
+    }
     Intent intent = activity.getIntent();
     sendjsData.sendIntilialData(promise,intent);
   }
